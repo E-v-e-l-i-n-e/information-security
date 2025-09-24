@@ -23,6 +23,8 @@ jobs:
 
       - name: Build with Maven
         run: mvn clean install
+        working-directory: ./lab1 
 
       - name: Run OWASP Dependency-Check
         run: mvn org.owasp:dependency-check-maven:check
+        working-directory: ./lab1 
