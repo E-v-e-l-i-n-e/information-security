@@ -49,5 +49,5 @@ jobs:
         working-directory: ./lab1
 
       - name: Run OWASP Dependency-Check
-        run: mvn org.owasp:dependency-check-maven:check
+        run: mvn org.owasp:dependency-check-maven:check -Ddc.nvd.apiKey=${{ secrets.NVD_API_KEY }}
         working-directory: ./lab1
