@@ -11,8 +11,8 @@ import java.util.Date;
 @Component
 public class JwtService {
 
-    String jwtSecret = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    private final Key key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+    private static final String jwtSecret = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private static final Key key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     long jwtExpirationMs = 7200000;
 
     public String generateToken(String username) {
