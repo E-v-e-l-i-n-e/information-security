@@ -39,7 +39,7 @@
       - name: Wait for PostgreSQL to be ready
         run: |
           echo "Waiting for PostgreSQL..."
-          while ! nc -z postgres 5432; do
+          while ! pg_isready --host=postgres --port=5432; do
             sleep 1 # wait for 1 second before check again
           done
           echo "PostgreSQL is ready!"
