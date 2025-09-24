@@ -1,53 +1,53 @@
 name: CI/CD Pipeline
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+push:
+branches:
+- main
+pull_request:
+branches:
+- main
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:13
-        env:
-          POSTGRES_DB: IS_lab1 
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: ROOT
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+build:
+runs-on: ubuntu-latest
+services:
+postgres:
+image: postgres:13
+env:
+POSTGRES_DB: IS_lab1
+POSTGRES_USER: postgres
+POSTGRES_PASSWORD: ROOT
+ports:
+- 5432:5432
+options: >-
+--health-cmd pg_isready
+--health-interval 10s
+--health-timeout 5s
+--health-retries 5
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+steps:
+  - name: Checkout code
+    uses: actions/checkout@v4
 
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
+  - name: Set up JDK
+    uses: actions/setup-java@v4
+    with:
+      distribution: 'temurin'
+      java-version: '17'
 
-      - name: Wait for PostgreSQL to be ready
-        run: |
-          echo "Waiting for PostgreSQL..."
-          while ! nc -z localhost 5432; do   
-            sleep 1 # wait for 1 second before check again
-          done
-          echo "PostgreSQL is ready!"
-          
-      - name: Build with Maven
-        run: mvn clean install
-        working-directory: ./lab1
+  - name: Wait for PostgreSQL to be ready
+    run: |
+      echo "Waiting for PostgreSQL..."
+      while ! nc -z postgres 5432; do   
+        sleep 1 # wait for 1 second before check again
+      done
+      echo "PostgreSQL is ready!"
+      
+  - name: Build with Maven
+    run: mvn clean install -Dspring.profiles.active=test
+    working-directory: ./lab1
 
-      - name: Run OWASP Dependency-Check
-        run: mvn org.owasp:dependency-check-maven:check -Ddc.nvd.apiKey=${{ secrets.NVD_API_KEY }}
-        working-directory: ./lab1
+  - name: Run OWASP Dependency-Check
+    run: mvn org.owasp:dependency-check-maven:check -Ddc.nvd.apiKey=${{ secrets.NVD_API_KEY }}
+    working-directory: ./lab1
