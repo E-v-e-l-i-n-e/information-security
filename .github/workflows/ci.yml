@@ -16,7 +16,7 @@
           image: postgres:13
           env:
             POSTGRES_DB: IS_lab1 
-            POSTGRES_USER: root
+            POSTGRES_USER: postgres
             POSTGRES_PASSWORD: ROOT
           ports:
             - 5432:5432
@@ -38,7 +38,7 @@
 
       - name: Start PostgreSQL container
         run: |
-        docker run --name postgres -p 5432:5432 -e POSTGRES_DB=IS_lab1 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=ROOT -d postgres:13
+          docker run --name postgres -p 5432:5432 -e POSTGRES_DB=IS_lab1 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=ROOT -d postgres:13
       
       # Ждем, пока PostgreSQL будет готов
       - name: Wait for PostgreSQL to be ready
