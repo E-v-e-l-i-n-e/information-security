@@ -49,5 +49,5 @@ jobs:
         working-directory: ./lab1
 
       - name: Run OWASP Dependency-Check
-        run: mvn org.owasp:dependency-check-maven:check
+        run: mvn org.owasp:dependency-check-maven:check -Ddc.nvd.apiKey=F1BD0FF4-0C99-F011-8362-0EBF96DE670D
         working-directory: ./lab1
