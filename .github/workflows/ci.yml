@@ -30,6 +30,13 @@
       - name: Checkout code
         uses: actions/checkout@v4
 
+     
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: java
+        working-directory: ./lab1 
+
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -40,22 +47,18 @@
         run: mvn clean install -Dspring.profiles.active=test
         working-directory: ./lab1
 
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        working-directory: ./lab1 
+
       - name: Run OWASP Dependency-Check
+      
         run: mvn org.owasp:dependency-check-maven:check -Ddc.nvd.apiKey=${{ secrets.NVD_API_KEY }} -Dformat=ALL
         working-directory: ./lab1
 
       - name: Upload Dependency Check Report
         uses: actions/upload-artifact@v4
         with:
-          name: dependency-check-report
+          name: dependency-check-report-html
           path: lab1/target/dependency-check-report.html
           retention-days: 5
-
-      - name: Generate SpotBugs HTML report
-        run: mvn site -Dspotbugs.skip=false
-
-      - name: Upload SpotBugs HTML report
-        uses: actions/upload-artifact@v4
-        with:
-          name: spotbugs-html-report
-          path: target/site/spotbugs.html
