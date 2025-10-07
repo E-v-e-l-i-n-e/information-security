@@ -35,7 +35,7 @@
         uses: github/codeql-action/init@v3
         with:
           languages: java
-        working-directory: ./lab1 
+          working-directory: ./lab1 
 
       - name: Set up JDK
         uses: actions/setup-java@v4
