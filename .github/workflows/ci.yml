@@ -36,23 +36,26 @@
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Start PostgreSQL container
-        run: |
-          docker run --name postgres -e POSTGRES_DB=IS_lab1 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=ROOT -d postgres:13
-      
-      # Ждем, пока PostgreSQL будет готов
-      - name: Wait for PostgreSQL to be ready
-        run: |
-          echo "Waiting for PostgreSQL..."
-          while ! docker exec postgres pg_isready --host=localhost --port=5432; do
-            sleep 3 # ждем 3 секунды, чтобы дать базе данных запуститься
-          done
-          echo "PostgreSQL is ready!"
-
       - name: Build with Maven
         run: mvn clean install -Dspring.profiles.active=test
         working-directory: ./lab1
 
       - name: Run OWASP Dependency-Check
-        run: mvn org.owasp:dependency-check-maven:check -Ddc.nvd.apiKey=${{ secrets.NVD_API_KEY }}
+        run: mvn org.owasp:dependency-check-maven:check -Ddc.nvd.apiKey=${{ secrets.NVD_API_KEY }} -Dformat=ALL
         working-directory: ./lab1
+
+      - name: Upload Dependency Check Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: lab1/target/dependency-check-report.html
+          retention-days: 5
+
+      - name: Generate SpotBugs HTML report
+        run: mvn site -Dspotbugs.skip=false
+
+      - name: Upload SpotBugs HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: spotbugs-html-report
+          path: target/site/spotbugs.html
