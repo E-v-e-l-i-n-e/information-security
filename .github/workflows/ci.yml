@@ -6,17 +6,19 @@ on:
   pull_request:
     branches: [ "**" ]
 
+defaults:
+  run:
+    working-directory: lab1
+
 jobs:
   build-and-scan:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout source
-        working-directory: ./lab1
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
-        working-directory: ./lab1
         uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -24,7 +26,6 @@ jobs:
 
       - name: Cache Maven packages
         uses: actions/cache@v4
-        working-directory: ./lab1
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -32,31 +33,33 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: Build with Maven
-        working-directory: ./lab1
         run: mvn -B clean package --file pom.xml
 
-
+      # SAST XML report
       - name: Run SpotBugs
-        working-directory: ./lab1
         run: mvn com.github.spotbugs:spotbugs-maven-plugin:4.8.3.0:spotbugs -Dspotbugs.outputFormat=html
 
+      - name: Upload SpotBugs report
+        uses: actions/upload-artifact@v4
+        with:
+          name: spotbugs-report
+          path: lab1/target/spotbugsXml.xml
+      
+      # SAST html report
       - name: Generate SpotBugs HTML report
-        working-directory: ./lab1
         run: mvn site -Dspotbugs.skip=false
 
       - name: Upload SpotBugs HTML report
-        working-directory: ./lab1
         uses: actions/upload-artifact@v4
         with:
           name: spotbugs-html-report
           path: lab1/target/site/spotbugs.html
 
+      # SCA
       - name: Run OWASP Dependency-Check
-        working-directory: ./lab1
         run: mvn org.owasp:dependency-check-maven:check -DnvdApiKey=${{ secrets.NVD_API_KEY }} -Dformat=ALL
 
       - name: Upload Dependency-Check report
-        working-directory: ./lab1
         uses: actions/upload-artifact@v4
         with:
           name: dependency-check-report
